@@ -1,36 +1,73 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Nourish
 
-## Getting Started
+AI nutrition planner — tell Nourish your goal once, and it finds meals from nearby restaurants
+that hit your calories, protein, and budget, then makes ordering effortless.
 
-First, run the development server:
+This repository is an early-stage **scaffold**, not a finished product: pages are placeholders
+backed by mock data, and integrations (Supabase, OpenAI, Swiggy) are configured but not
+implemented.
+
+## Tech stack
+
+- Next.js 15 (App Router) + TypeScript
+- Tailwind CSS v4 + shadcn/ui
+- Supabase (client/server setup only, no schema or auth flows yet)
+- OpenAI SDK (client configured, no prompts/flows yet)
+- Swiggy MCP integration (interfaces only, no implementation)
+- TanStack React Query
+- ESLint + Prettier
+
+## Getting started
+
+Requires Node.js 20+.
 
 ```bash
+npm install
+cp .env.example .env.local # fill in Supabase/OpenAI keys when ready
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Other scripts:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run lint          # ESLint
+npm run format        # Prettier write
+npm run format:check  # Prettier check
+npm run build         # production build
+```
 
-## Learn More
+## Project structure
 
-To learn more about Next.js, take a look at the following resources:
+```text
+app/
+  (marketing)/    # landing page, public
+  (auth)/         # login, onboarding
+  (app)/          # dashboard, plan, history, settings (shared sidebar shell)
+components/
+  ui/             # shadcn/ui primitives
+  layout/         # headers, sidebar, app shell
+  dashboard/      # dashboard-specific mock components
+  shared/         # cross-page components (loading/error states, logo)
+  providers/      # React Query provider, etc.
+services/         # business logic, one file per domain (auth, ai, restaurant)
+lib/
+  ai/             # OpenAI client + config (placeholder)
+  swiggy/         # Swiggy MCP client interface (no implementation)
+  supabase/       # Supabase browser/server clients (no schema yet)
+  utils.ts        # shadcn `cn` helper
+hooks/            # React Query hooks
+types/            # shared TypeScript types
+utils/            # formatting helpers
+constants/        # nav config, app copy, mock data
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## What's implemented vs. not
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+**Implemented:** navigation between all pages, dark-mode-first design system, mock dashboard UI,
+loading/error states, folder architecture, env var templates, client configs for Supabase/OpenAI.
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**Not implemented (by design):** auth flows, database schema, AI meal planning, Swiggy
+ordering/MCP calls, and any real backend logic. See `services/*.ts` and `lib/swiggy/client.ts`
+for the placeholder seams where that logic will land.
