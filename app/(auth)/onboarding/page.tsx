@@ -39,11 +39,11 @@ export default function OnboardingPage() {
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-2">
             <Label htmlFor="calories">Daily calories</Label>
-            <Input id="calories" placeholder="2,200" disabled />
+            <Input id="calories" placeholder="2,200" />
           </div>
           <div className="space-y-2">
             <Label htmlFor="budget">Daily budget</Label>
-            <Input id="budget" placeholder="₹600" disabled />
+            <Input id="budget" placeholder="₹600" />
           </div>
         </div>
 

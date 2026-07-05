@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Logo } from '@/components/shared/logo';
+import { ThemeToggle } from '@/components/shared/theme-toggle';
 import { Button } from '@/components/ui/button';
 
 export function MarketingHeader() {
@@ -10,6 +11,7 @@ export function MarketingHeader() {
           <Logo />
         </Link>
         <nav className="flex items-center gap-2">
+          <ThemeToggle />
           <Button asChild variant="ghost" size="sm">
             <Link href="/login">Log in</Link>
           </Button>
