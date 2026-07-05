@@ -4,7 +4,7 @@ AI nutrition planner — tell Nourish your goal once, and it finds meals from ne
 that hit your calories, protein, and budget, then makes ordering effortless.
 
 This repository is an early-stage **scaffold**, not a finished product: pages are placeholders
-backed by mock data, and most integrations (OpenAI, Swiggy) are configured but not implemented.
+backed by mock data, and most integrations (Gemini, Swiggy) are configured but not implemented.
 Supabase has a live database with an initial schema (see below).
 
 ## Tech stack
@@ -12,7 +12,7 @@ Supabase has a live database with an initial schema (see below).
 - Next.js 15 (App Router) + TypeScript
 - Tailwind CSS v4 + shadcn/ui
 - Supabase (`profiles`, `nutrition_goals`, `meal_entries` tables + RLS; no auth flows wired up yet)
-- OpenAI SDK (client configured, no prompts/flows yet)
+- Gemini SDK (`@google/genai`, client configured, no prompts/flows yet)
 - Swiggy MCP integration (interfaces only, no implementation)
 - TanStack React Query
 - ESLint + Prettier
@@ -23,7 +23,7 @@ Requires Node.js 20+.
 
 ```bash
 npm install
-cp .env.example .env.local # fill in Supabase/OpenAI keys when ready
+cp .env.example .env.local # fill in Supabase/Gemini keys when ready
 npm run dev
 ```
 
@@ -53,7 +53,7 @@ components/
   providers/      # React Query provider, etc.
 services/         # business logic, one file per domain (auth, ai, restaurant)
 lib/
-  ai/             # OpenAI client + config (placeholder)
+  ai/             # Gemini client + config (placeholder)
   swiggy/         # Swiggy MCP client interface (no implementation)
   supabase/       # Supabase browser/server clients
   utils.ts        # shadcn `cn` helper
@@ -81,7 +81,7 @@ further schema changes: `supabase migration new <name>`, edit the SQL, then `sup
 ## What's implemented vs. not
 
 **Implemented:** navigation between all pages, dark-mode-first design system, mock dashboard UI,
-loading/error states, folder architecture, env var templates, client configs for Supabase/OpenAI,
+loading/error states, folder architecture, env var templates, client configs for Supabase/Gemini,
 and the initial Supabase schema above.
 
 **Not implemented (by design):** auth flows (no sign-up/login wired to Supabase Auth yet), AI meal

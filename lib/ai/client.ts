@@ -1,9 +1,9 @@
-import OpenAI from 'openai';
+import { GoogleGenAI } from '@google/genai';
 
 /**
- * Server-only OpenAI client. Never import this from a Client Component -
- * OPENAI_API_KEY must stay on the server.
+ * Server-only Gemini client. Never import this from a Client Component -
+ * GEMINI_API_KEY must stay on the server.
  */
-export const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+export const gemini = new GoogleGenAI({
+  apiKey: process.env.GEMINI_API_KEY,
 });
