@@ -7,42 +7,6 @@ import type {
   SwiggySearchRestaurantsResult,
 } from './types';
 
-const ADDRESS_LABEL_KEYS = [
-  'display_address',
-  'displayAddress',
-  'formattedAddress',
-  'formatted_address',
-  'address',
-  'addressLine',
-  'addressLine2',
-  'address_line',
-  'address_line2',
-  'shortAddress',
-  'short_address',
-  'fullAddress',
-  'full_address',
-  'name',
-  'title',
-  'label',
-  'annotation',
-  'tag',
-  'area',
-  'locality',
-  'subLocality',
-  'sub_locality',
-  'city',
-  'cityName',
-  'state',
-  'landmark',
-  'flat',
-  'flatNo',
-  'floor',
-  'postalCode',
-  'pincode',
-] as const;
-
-const SKIP_DEEP_SCAN_KEYS = /^(id|addressid|address_id|uuid|token|lat|lng|latitude|longitude|pin|coordinates)$/i;
-
 function isNonEmptyString(value: unknown): value is string {
   return typeof value === 'string' && value.trim().length > 0;
 }
@@ -77,26 +41,6 @@ function findArray(data: unknown, keys: string[]): unknown[] {
   }
 
   return [];
-}
-
-function collectReadableStrings(source: Record<string, unknown>, depth = 0): string[] {
-  if (depth > 3) return [];
-
-  const strings: string[] = [];
-  for (const [key, value] of Object.entries(source)) {
-    if (SKIP_DEEP_SCAN_KEYS.test(key)) continue;
-
-    if (isNonEmptyString(value) && value.trim().length >= 8 && /[,\s]/.test(value)) {
-      strings.push(value.trim());
-      continue;
-    }
-
-    if (value && typeof value === 'object' && !Array.isArray(value)) {
-      strings.push(...collectReadableStrings(value as Record<string, unknown>, depth + 1));
-    }
-  }
-
-  return strings;
 }
 
 function labelFromMessage(addressId: string, message?: string, textContent?: string): string | undefined {
@@ -137,6 +81,114 @@ export function normalizeAddresses(data: unknown): SwiggyAddress[] {
     .filter((address) => address.addressId.length > 0);
 }
 
+function compactAddress(text: string, maxLength = 72): string {
+  const cleaned = text.replace(/\s+/g, ' ').replace(/,+/g, ',').replace(/,\s*$/, '').trim();
+  if (cleaned.length <= maxLength) return cleaned;
+  return `${cleaned.slice(0, maxLength - 1).trimEnd()}…`;
+}
+
+function extractAddressTag(record: Record<string, unknown>): string | undefined {
+  for (const key of ['annotation', 'tag', 'addressTag', 'addressType', 'type', 'label']) {
+    const value = record[key];
+    if (!isNonEmptyString(value)) continue;
+    const trimmed = value.replace(/^\[|\]$/g, '').trim();
+    if (trimmed.length > 0 && trimmed.length <= 20 && !trimmed.includes(',')) {
+      return trimmed;
+    }
+  }
+  return undefined;
+}
+
+function pickPrimaryAddressLine(record: Record<string, unknown>): string | undefined {
+  for (const key of [
+    'display_address',
+    'displayAddress',
+    'formattedAddress',
+    'formatted_address',
+    'address',
+    'shortAddress',
+    'short_address',
+    'fullAddress',
+    'full_address',
+    'addressLine',
+  ]) {
+    const value = record[key];
+    if (isNonEmptyString(value)) return value.trim();
+  }
+
+  const line1 = record.addressLine;
+  const line2 = record.addressLine2 ?? record.address_line2;
+  if (isNonEmptyString(line1)) {
+    return isNonEmptyString(line2) ? `${line1}, ${line2}` : line1;
+  }
+
+  const parts = uniqueStrings(
+    ['flat', 'flatNo', 'floor', 'landmark', 'area', 'locality', 'subLocality', 'city', 'state', 'pincode']
+      .map((key) => record[key])
+      .filter(isNonEmptyString)
+      .map((value) => String(value).trim()),
+  );
+
+  if (parts.length > 0) return parts.slice(0, 4).join(', ');
+  return undefined;
+}
+
+function dedupeRepeatedAddress(text: string): string {
+  let cleaned = text.trim().replace(/\s*\(ID:\s*\)\s*$/i, '');
+
+  const bracketMatch = cleaned.match(/^\[([^\]]+)\]\s*/);
+  if (bracketMatch) {
+    cleaned = cleaned.slice(bracketMatch[0].length).trim();
+  }
+
+  const repeatedBlocks = cleaned.split(/,\s*(?=\[[^\]]+\]\s)|,\s*(?=[^,]{1,40}:\s)/);
+  if (repeatedBlocks.length > 1) {
+    const complete = repeatedBlocks.find((block) => /\b\d{6}\b/.test(block));
+    cleaned = (complete ?? repeatedBlocks[0]!).trim();
+  }
+
+  const segments = cleaned
+    .split(',')
+    .map((part) => part.trim())
+    .filter(Boolean);
+
+  if (segments.length <= 1) return cleaned;
+
+  const uniqueSegments: string[] = [];
+
+  for (const segment of segments) {
+    const norm = segment.toLowerCase();
+    const isDuplicate = uniqueSegments.some((existing) => {
+      const existingNorm = existing.toLowerCase();
+      return existingNorm === norm || existingNorm.includes(norm) || norm.includes(existingNorm);
+    });
+
+    if (!isDuplicate) {
+      uniqueSegments.push(segment);
+    }
+  }
+
+  return uniqueSegments.join(', ');
+}
+
+function normalizeAddressLine(raw: string): string {
+  let line = raw.trim();
+
+  const embeddedTag = line.match(/^\[([^\]]+)\]\s*(.+)$/);
+  if (embeddedTag) {
+    line = embeddedTag[2]!.trim();
+  }
+
+  line = dedupeRepeatedAddress(line);
+
+  const colonParts = line.split(':').map((part) => part.trim()).filter(Boolean);
+  if (colonParts.length === 2 && colonParts[0]!.length <= 24 && !/\d{5,}/.test(colonParts[0]!)) {
+    line = colonParts[1]!;
+  }
+
+  return compactAddress(line);
+}
+
 export function formatSwiggyAddressLabel(
   address: SwiggyAddress,
   options?: { message?: string; textContent?: string },
@@ -144,41 +196,26 @@ export function formatSwiggyAddressLabel(
   const record = address as Record<string, unknown>;
   const addressId = address.addressId;
 
-  const annotation = [record.annotation, record.tag, record.label, record.title, record.name]
-    .filter(isNonEmptyString)
-    .find((value) => value.length <= 24);
+  const tag = extractAddressTag(record);
+  let line = pickPrimaryAddressLine(record);
 
-  const lineParts = uniqueStrings(
-    ADDRESS_LABEL_KEYS.map((key) => record[key])
-      .filter(isNonEmptyString)
-      .flatMap((value) => value.split(',').map((part) => part.trim())),
-  );
-
-  const nestedObjects = [record.addressDetails, record.location, record.meta, record.details];
-  for (const nested of nestedObjects) {
-    if (nested && typeof nested === 'object') {
-      lineParts.push(
-        ...ADDRESS_LABEL_KEYS.map((key) => (nested as Record<string, unknown>)[key])
-          .filter(isNonEmptyString),
-      );
-    }
+  if (!line && isNonEmptyString(record.name) && record.name.includes(',')) {
+    line = record.name;
   }
 
-  const readable = uniqueStrings([
-    ...lineParts,
-    ...collectReadableStrings(record),
-    labelFromMessage(addressId, options?.message, options?.textContent) ?? '',
-  ]).filter((part) => !part.toLowerCase().includes(addressId.toLowerCase()));
+  if (!line && isNonEmptyString(record.name)) {
+    line = record.name;
+  }
 
-  const body = readable.join(', ');
-  if (annotation && body) return `${annotation} · ${body}`;
-  if (body) return body;
-  if (annotation) return annotation;
+  if (line) {
+    const formatted = normalizeAddressLine(line);
+    return tag ? `${tag} · ${formatted}` : formatted;
+  }
 
   const messageLabel = labelFromMessage(addressId, options?.message, options?.textContent);
-  if (messageLabel) return messageLabel;
+  if (messageLabel) return compactAddress(normalizeAddressLine(messageLabel));
 
-  return `Saved address (${addressId.slice(0, 12)}…)`;
+  return `Address ${addressId.slice(0, 8)}…`;
 }
 
 function firstString(

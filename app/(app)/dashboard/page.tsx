@@ -8,7 +8,7 @@ import { ProteinProgressCard } from '@/components/dashboard/protein-progress-car
 import { SwiggyMenuSection } from '@/components/dashboard/swiggy-menu-section';
 import { SwiggyRestaurantsSection } from '@/components/dashboard/swiggy-restaurants-section';
 import { SwiggyConnectedToast } from '@/components/swiggy/swiggy-connected-toast';
-import { MOCK_BUDGET, MOCK_MEALS, MOCK_MACROS } from '@/constants/mock-data';
+import { MOCK_MEALS } from '@/constants/mock-data';
 
 export default function DashboardPage() {
   return (
@@ -28,8 +28,8 @@ export default function DashboardPage() {
 
       <div className="grid gap-4 sm:grid-cols-3">
         <CaloriesCard />
-        <ProteinProgressCard macros={MOCK_MACROS} />
-        <BudgetTrackerCard budget={MOCK_BUDGET} />
+        <ProteinProgressCard />
+        <BudgetTrackerCard />
       </div>
 
       <div className="grid gap-4 lg:grid-cols-3">

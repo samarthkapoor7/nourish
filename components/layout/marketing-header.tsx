@@ -5,18 +5,18 @@ import { Button } from '@/components/ui/button';
 
 export function MarketingHeader() {
   return (
-    <header className="border-border/60 bg-background/80 sticky top-0 z-40 border-b backdrop-blur-md">
+    <header className="border-border/40 bg-background/90 sticky top-0 z-40 border-b">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
         <Link href="/">
           <Logo />
         </Link>
         <nav className="flex items-center gap-2">
           <ThemeToggle />
-          <Button asChild variant="ghost" size="sm">
+          <Button asChild variant="ghost" size="sm" className="rounded-xl">
             <Link href="/login">Log in</Link>
           </Button>
-          <Button asChild size="sm">
-            <Link href="/onboarding">Get started</Link>
+          <Button asChild size="sm" className="rounded-xl">
+            <Link href="/onboarding">Plan Today&apos;s Meals</Link>
           </Button>
         </nav>
       </div>
