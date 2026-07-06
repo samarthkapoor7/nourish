@@ -44,7 +44,11 @@ export const SWIGGY_CLIENT_NAME = process.env.SWIGGY_CLIENT_NAME ?? 'Nourish';
 /** Cookie holding the opaque session id; see lib/swiggy/session.ts. */
 export const SWIGGY_SESSION_COOKIE = 'swiggy_session_id';
 
+/** Cookie holding the user's chosen delivery address id from get_addresses. */
+export const SWIGGY_ADDRESS_COOKIE = 'swiggy_address_id';
+
 /** Short-lived cookies used only across the login -> callback round trip. */
 export const SWIGGY_PKCE_COOKIE = 'swiggy_pkce_verifier';
 export const SWIGGY_STATE_COOKIE = 'swiggy_oauth_state';
 export const SWIGGY_CLIENT_ID_COOKIE = 'swiggy_oauth_client_id';
+export const SWIGGY_NEXT_COOKIE = 'swiggy_oauth_next';

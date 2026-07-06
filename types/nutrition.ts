@@ -42,3 +42,14 @@ export interface Restaurant {
   imageUrl?: string;
   matchReason: string;
 }
+
+export interface MenuItem {
+  id: string;
+  name: string;
+  description?: string;
+  price: number;
+  imageUrl?: string;
+  restaurantId: string;
+  restaurantName: string;
+  isVeg?: boolean;
+}

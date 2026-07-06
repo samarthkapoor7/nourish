@@ -1,8 +1,10 @@
+import { Suspense } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
+import { SwiggyConnectCard } from '@/components/settings/swiggy-connect-card';
 
 export default function SettingsPage() {
   return (
@@ -11,6 +13,10 @@ export default function SettingsPage() {
         <h2 className="text-2xl font-semibold tracking-tight">Settings</h2>
         <p className="text-muted-foreground text-sm">Manage your profile and nutrition goals.</p>
       </div>
+
+      <Suspense fallback={null}>
+        <SwiggyConnectCard />
+      </Suspense>
 
       <Card className="border-border/60">
         <CardHeader>
