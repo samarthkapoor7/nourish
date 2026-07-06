@@ -1,19 +1,20 @@
-import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import {
-  SWIGGY_CLIENT_ID_COOKIE,
-  SWIGGY_PKCE_COOKIE,
-  SWIGGY_STATE_COOKIE,
-} from '@/lib/swiggy/config';
+import { NextResponse, type NextRequest } from 'next/server';
+import { setSwiggyTransientCookies } from '@/lib/swiggy/cookies';
 import { buildSwiggyAuthorizationUrl, registerSwiggyClient } from '@/lib/swiggy/oauth';
 import { generatePkcePair, generateState } from '@/lib/swiggy/pkce';
+
+function sanitizeNextPath(next: string | null): string | null {
+  if (!next || !next.startsWith('/') || next.startsWith('//')) return null;
+  return next;
+}
 
 /**
  * Starts the Swiggy OAuth 2.1 + PKCE flow (step 1-2 of the docs' walkthrough):
  * register a client via DCR, generate a PKCE pair + CSRF state, stash them
- * in short-lived cookies, then redirect to Swiggy's /auth/authorize.
+ * in short-lived cookies on the redirect response, then redirect to Swiggy.
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const next = sanitizeNextPath(request.nextUrl.searchParams.get('next'));
   const registration = await registerSwiggyClient();
   const { codeVerifier, codeChallenge } = generatePkcePair();
   const state = generateState();
@@ -24,20 +25,13 @@ export async function GET() {
     state,
   });
 
-  const cookieStore = await cookies();
-  const transientCookieOptions = {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    // Must be "lax", not "strict": these cookies need to survive the
-    // top-level cross-site GET redirect back from mcp.swiggy.com.
-    sameSite: 'lax' as const,
-    path: '/',
-    maxAge: 600, // 10 minutes - generous room for phone + OTP entry.
-  };
+  const response = NextResponse.redirect(authorizationUrl);
+  setSwiggyTransientCookies(response, {
+    codeVerifier,
+    state,
+    clientId: registration.client_id,
+    next,
+  });
 
-  cookieStore.set(SWIGGY_PKCE_COOKIE, codeVerifier, transientCookieOptions);
-  cookieStore.set(SWIGGY_STATE_COOKIE, state, transientCookieOptions);
-  cookieStore.set(SWIGGY_CLIENT_ID_COOKIE, registration.client_id, transientCookieOptions);
-
-  return NextResponse.redirect(authorizationUrl);
+  return response;
 }

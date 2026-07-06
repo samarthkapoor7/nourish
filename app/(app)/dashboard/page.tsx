@@ -1,15 +1,21 @@
+import { Suspense } from 'react';
 import { AiExplanationPanel } from '@/components/dashboard/ai-explanation-panel';
 import { BudgetTrackerCard } from '@/components/dashboard/budget-tracker-card';
 import { CaloriesCard } from '@/components/dashboard/calories-card';
 import { MealTimeline } from '@/components/dashboard/meal-timeline';
 import { OrderButton } from '@/components/dashboard/order-button';
 import { ProteinProgressCard } from '@/components/dashboard/protein-progress-card';
-import { RestaurantCards } from '@/components/dashboard/restaurant-cards';
-import { MOCK_BUDGET, MOCK_MEALS, MOCK_MACROS, MOCK_RESTAURANTS } from '@/constants/mock-data';
+import { SwiggyMenuSection } from '@/components/dashboard/swiggy-menu-section';
+import { SwiggyRestaurantsSection } from '@/components/dashboard/swiggy-restaurants-section';
+import { SwiggyConnectedToast } from '@/components/swiggy/swiggy-connected-toast';
+import { MOCK_MEALS } from '@/constants/mock-data';
 
 export default function DashboardPage() {
   return (
     <div className="mx-auto max-w-6xl space-y-6">
+      <Suspense fallback={null}>
+        <SwiggyConnectedToast />
+      </Suspense>
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-2xl font-semibold tracking-tight">Good afternoon</h2>
@@ -22,8 +28,8 @@ export default function DashboardPage() {
 
       <div className="grid gap-4 sm:grid-cols-3">
         <CaloriesCard />
-        <ProteinProgressCard macros={MOCK_MACROS} />
-        <BudgetTrackerCard budget={MOCK_BUDGET} />
+        <ProteinProgressCard />
+        <BudgetTrackerCard />
       </div>
 
       <div className="grid gap-4 lg:grid-cols-3">
@@ -33,7 +39,8 @@ export default function DashboardPage() {
         <AiExplanationPanel />
       </div>
 
-      <RestaurantCards restaurants={MOCK_RESTAURANTS} />
+      <SwiggyMenuSection />
+      <SwiggyRestaurantsSection />
     </div>
   );
 }

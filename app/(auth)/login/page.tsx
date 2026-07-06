@@ -1,11 +1,13 @@
 'use client';
 
+import { Suspense } from 'react';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { SwiggyLoginOption } from '@/components/auth/swiggy-login-option';
 
 export default function LoginPage() {
   return (
@@ -34,6 +36,9 @@ export default function LoginPage() {
             Log in
           </Button>
         </form>
+        <Suspense fallback={null}>
+          <SwiggyLoginOption />
+        </Suspense>
         <p className="text-muted-foreground text-center text-sm">
           New to Nourish?{' '}
           <Link

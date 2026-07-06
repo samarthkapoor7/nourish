@@ -109,3 +109,55 @@ export interface SwiggySearchRestaurantsResult {
   restaurants: SwiggyRestaurant[];
   nextOffset?: number;
 }
+
+// ---------------------------------------------------------------------------
+// search_menu (Food)
+// ---------------------------------------------------------------------------
+
+export interface SwiggySearchMenuParams {
+  addressId: string;
+  query: string;
+  restaurantIdOfAddedItem?: string;
+  vegFilter?: 0 | 1;
+  offset?: number;
+}
+
+export interface SwiggyMenuItem {
+  id: string;
+  name: string;
+  price?: number;
+  [field: string]: unknown;
+}
+
+export interface SwiggySearchMenuResult {
+  items?: SwiggyMenuItem[];
+  menuItems?: SwiggyMenuItem[];
+  nextOffset?: number;
+}
+
+// ---------------------------------------------------------------------------
+// get_restaurant_menu (Food)
+// ---------------------------------------------------------------------------
+
+export interface SwiggyGetRestaurantMenuParams {
+  addressId: string;
+  restaurantId: string;
+  page?: number;
+  pageSize?: number;
+}
+
+export interface SwiggyMenuCategory {
+  name?: string;
+  title?: string;
+  items?: SwiggyMenuItem[];
+  [field: string]: unknown;
+}
+
+export interface SwiggyRestaurantMenuResult {
+  categories?: SwiggyMenuCategory[];
+  menu?: SwiggyMenuCategory[];
+  page?: number;
+  totalPages?: number;
+  restaurantName?: string;
+  [field: string]: unknown;
+}
