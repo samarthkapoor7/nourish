@@ -28,6 +28,13 @@ export default function WeeklyPlanPage() {
         ))}
         </div>
       </div>
+
+      <div className="bg-card rounded-xl p-4 ring-1 ring-white/6 sm:p-5">
+        <p className="text-sm font-semibold">Agent status</p>
+        <p className="text-muted-foreground mt-2 text-sm">
+          Generated 3 minutes ago. Next optimization run scheduled tomorrow at 8:00 AM.
+        </p>
+      </div>
     </div>
   );
 }

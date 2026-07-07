@@ -51,7 +51,7 @@ export function HomeHeader({
   onSearchQueryChange,
   onFilterChange,
 }: HomeHeaderProps) {
-  const { settings, goals } = useUserSettings();
+  const { settings } = useUserSettings();
   const statusQuery = useSwiggyStatus();
   const name = settings.name || 'Aryan';
   const connected = statusQuery.data?.connected ?? false;
@@ -65,8 +65,7 @@ export function HomeHeader({
             {getGreeting()}, {name}
           </h1>
           <p className="text-muted-foreground mt-1 text-sm">
-            {goals.dailyCalories.toLocaleString()} kcal · ₹{goals.dailyBudget} budget ·{' '}
-            {goals.dailyProtein}g protein
+            You&apos;re on track today. I&apos;ve prepared meals that fit your nutrition goals and budget.
           </p>
         </div>
         <Button
