@@ -12,8 +12,8 @@ export function DaySummaryCard({ day }: { day: MockDaySummary }) {
   return (
     <div
       className={cn(
-        'border-border/60 flex flex-col gap-3 rounded-2xl border p-4',
-        day.isToday && 'border-primary/50 bg-primary/5',
+        'bg-[#111111] flex flex-col gap-3 rounded-xl p-4 ring-1 ring-white/6',
+        day.isToday && 'bg-[#FC8019]/[0.08] ring-[#FC8019]/40',
       )}
     >
       <div className="flex items-center justify-between">

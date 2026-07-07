@@ -19,9 +19,12 @@ export function AppTopbar() {
   const activeItem = APP_NAV_ITEMS.find((item) => item.href === pathname);
 
   return (
-    <header className="border-border/60 flex h-16 shrink-0 items-center justify-between border-b px-4 sm:px-6">
+    <header className="flex h-14 shrink-0 items-center justify-between px-6 lg:px-10">
       <div className="flex items-center gap-2">
-        <h1 className="text-sm font-medium">{activeItem?.label ?? 'Nourish'}</h1>
+        <h1 className="text-base font-semibold tracking-tight">{activeItem?.label ?? 'Nourish'}</h1>
+        {pathname === '/dashboard' && (
+          <span className="text-muted-foreground hidden text-sm sm:inline">Today</span>
+        )}
       </div>
 
       <nav className="flex items-center gap-1 md:hidden">

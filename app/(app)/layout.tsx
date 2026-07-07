@@ -7,7 +7,7 @@ export default function AppShellLayout({ children }: { children: React.ReactNode
       <AppSidebar />
       <div className="flex min-w-0 flex-1 flex-col">
         <AppTopbar />
-        <main className="flex-1 px-4 py-6 sm:px-6 sm:py-8">{children}</main>
+        <main className="flex-1 px-6 py-6 lg:px-10 lg:py-8">{children}</main>
       </div>
     </div>
   );

@@ -44,7 +44,7 @@ export function SettingsForms() {
 
   return (
     <>
-      <Card className="border-border/60">
+      <Card className="bg-card rounded-xl ring-1 ring-white/6">
         <CardHeader>
           <CardTitle className="text-base">Profile</CardTitle>
           <CardDescription>Basic account information.</CardDescription>
@@ -73,13 +73,13 @@ export function SettingsForms() {
         </CardContent>
       </Card>
 
-      <Card className="border-border/60">
+      <Card className="bg-card rounded-xl ring-1 ring-white/6">
         <CardHeader>
           <CardTitle className="text-base">Nutrition goals</CardTitle>
           <CardDescription>Used to score every recommended meal.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="daily-calories">Daily calories</Label>
               <Input
@@ -115,7 +115,7 @@ export function SettingsForms() {
         </CardContent>
       </Card>
 
-      <Card className="border-destructive/40">
+      <Card className="bg-card rounded-xl ring-1 ring-red-500/25">
         <CardHeader>
           <CardTitle className="text-base">Danger zone</CardTitle>
           <CardDescription>Permanently delete your account and all data.</CardDescription>

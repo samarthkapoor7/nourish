@@ -39,7 +39,7 @@ export function SwiggyConnectCard() {
 
   if (statusQuery.isLoading) {
     return (
-      <Card className="border-border/60">
+      <Card className="bg-card rounded-xl ring-1 ring-white/6">
         <CardContent className="flex items-center justify-center py-10">
           <Loader2 className="text-muted-foreground size-5 animate-spin" />
         </CardContent>
@@ -49,7 +49,7 @@ export function SwiggyConnectCard() {
 
   if (!connected) {
     return (
-      <Card className="border-border/60">
+      <Card className="bg-card rounded-xl ring-1 ring-white/6">
         <CardHeader>
           <CardTitle className="text-base">Swiggy</CardTitle>
           <CardDescription>
@@ -64,7 +64,7 @@ export function SwiggyConnectCard() {
   }
 
   return (
-    <Card className="border-border/60">
+    <Card className="bg-card rounded-xl ring-1 ring-white/6">
       <CardHeader>
         <CardTitle className="text-base">Swiggy</CardTitle>
         <CardDescription>Connected — live restaurant and menu data is enabled.</CardDescription>

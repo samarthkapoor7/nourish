@@ -26,7 +26,7 @@ export function PhoneMockup({ className }: { className?: string }) {
 
       <div className="border-border/40 bg-card relative overflow-hidden rounded-[2.75rem] border-[5px] shadow-2xl">
         <div className="bg-primary/10 px-5 pt-4 pb-3">
-          <p className="text-muted-foreground text-[11px]">Good afternoon ☀️</p>
+          <p className="text-muted-foreground text-[11px]">Good afternoon</p>
           <h3 className="text-base font-semibold tracking-tight">Today&apos;s meals</h3>
         </div>
 

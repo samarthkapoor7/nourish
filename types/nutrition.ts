@@ -30,6 +30,53 @@ export interface MealEntry {
   price: number;
   scheduledAt: string;
   ordered: boolean;
+  imageUrl?: string;
+  restaurantLogoUrl?: string;
+}
+
+export interface MealRecommendation {
+  id: string;
+  name: string;
+  restaurantName: string;
+  restaurantLogoUrl?: string;
+  imageUrl: string;
+  rating: number;
+  etaMinutes: number;
+  distanceKm: number;
+  calories: number;
+  proteinGrams: number;
+  price: number;
+  isVeg: boolean;
+  healthScore: number;
+  tags?: string[];
+}
+
+export interface SmartInsight {
+  id: string;
+  text: string;
+}
+
+export interface Achievement {
+  id: string;
+  title: string;
+  gradient: string;
+}
+
+export interface WeeklyMealPlanDay {
+  day: string;
+  date: string;
+  isToday?: boolean;
+  breakfast: string;
+  lunch: string;
+  dinner: string;
+  proteinGrams: number;
+  budget: number;
+}
+
+export interface YesterdayComparison {
+  calories: number;
+  proteinGrams: number;
+  budgetSpent: number;
 }
 
 export interface Restaurant {
