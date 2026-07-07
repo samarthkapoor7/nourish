@@ -44,6 +44,16 @@ export default function HistoryPage() {
           </div>
         </CardContent>
       </Card>
+
+      <Card className="bg-card rounded-xl ring-1 ring-white/6">
+        <CardContent className="p-5">
+          <p className="text-sm font-semibold">AI learned</p>
+          <p className="text-muted-foreground mt-2 text-sm">
+            You stayed under budget for 6 consecutive days. Nourish will prioritize high-protein
+            options under ₹300 for weekday lunches.
+          </p>
+        </CardContent>
+      </Card>
     </div>
   );
 }

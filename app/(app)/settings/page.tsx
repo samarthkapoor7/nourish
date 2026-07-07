@@ -14,6 +14,13 @@ export default function SettingsPage() {
         <SwiggyConnectCard />
       </Suspense>
 
+      <section className="bg-card rounded-xl p-5 ring-1 ring-white/6">
+        <p className="text-sm font-semibold">AI Status</p>
+        <p className="text-muted-foreground mt-2 text-sm">
+          Watching for discounts, menu changes, restaurant closures, and better alternatives.
+        </p>
+      </section>
+
       <SettingsForms />
     </div>
   );

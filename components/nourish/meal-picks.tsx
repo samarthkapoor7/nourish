@@ -15,6 +15,11 @@ import { formatCalories, formatCurrency, formatGrams } from '@/utils/format';
 interface MealPicksProps {
   searchQuery: string;
   activeFilter: SearchFilter;
+  maxBudget: number;
+  vegOnly: boolean;
+  mealType: 'any' | 'breakfast' | 'lunch' | 'snack' | 'dinner';
+  cuisine: 'any' | 'north indian' | 'south indian' | 'salad' | 'bowls' | 'continental';
+  spiceLevel: 'mild' | 'medium' | 'spicy';
 }
 
 const FILTER_TO_MENU_QUERY: Record<SearchFilter, string> = {
@@ -54,7 +59,44 @@ function mapMenuToRecommendation(index: number, item: MenuItem): MealRecommendat
   };
 }
 
-function applyFilter(meals: MealRecommendation[], searchQuery: string, activeFilter: SearchFilter) {
+function inferMealTypeTags(meal: MealRecommendation) {
+  const text = `${meal.name} ${meal.restaurantName}`.toLowerCase();
+  const tags: Array<'breakfast' | 'lunch' | 'snack' | 'dinner'> = [];
+  if (/(yogurt|oats|omelette|pancake|parfait|toast)/.test(text)) tags.push('breakfast');
+  if (/(bowl|thali|burrito|rice|plate|meal)/.test(text)) tags.push('lunch');
+  if (/(shake|trail mix|snack|bar|fruit)/.test(text)) tags.push('snack');
+  if (/(curry|dinner|tikka|grilled|stir fry|fish|chicken)/.test(text)) tags.push('dinner');
+  return tags.length ? tags : ['lunch'];
+}
+
+function inferCuisineTags(meal: MealRecommendation) {
+  const text = `${meal.name} ${meal.restaurantName}`.toLowerCase();
+  const tags: MealPicksProps['cuisine'][] = [];
+  if (/(paneer|tikka|thali|dal|roti|north)/.test(text)) tags.push('north indian');
+  if (/(idli|dosa|sambar|south)/.test(text)) tags.push('south indian');
+  if (/(salad|greens|lettuce)/.test(text)) tags.push('salad');
+  if (/(bowl|quinoa|burrito)/.test(text)) tags.push('bowls');
+  if (/(grilled|continental|salmon|steak|wrap)/.test(text)) tags.push('continental');
+  return tags.length ? tags : ['bowls'];
+}
+
+function inferSpiceLevel(meal: MealRecommendation): 'mild' | 'medium' | 'spicy' {
+  const text = `${meal.name} ${meal.restaurantName}`.toLowerCase();
+  if (/(spicy|masala|tandoori|chettinad|peri peri)/.test(text)) return 'spicy';
+  if (/(greek|yogurt|salad|parfait|mild)/.test(text)) return 'mild';
+  return 'medium';
+}
+
+function applyFilter(
+  meals: MealRecommendation[],
+  searchQuery: string,
+  activeFilter: SearchFilter,
+  maxBudget: number,
+  vegOnly: boolean,
+  mealType: MealPicksProps['mealType'],
+  cuisine: MealPicksProps['cuisine'],
+  spiceLevel: MealPicksProps['spiceLevel'],
+) {
   const normalizedQuery = searchQuery.trim().toLowerCase();
 
   const filtered = meals.filter((meal) => {
@@ -68,11 +110,28 @@ function applyFilter(meals: MealRecommendation[], searchQuery: string, activeFil
       activeFilter === 'all' ||
       meal.tags?.includes(activeFilter) ||
       (activeFilter === 'vegetarian' && meal.isVeg) ||
-      (activeFilter === 'under-budget' && meal.price <= 300) ||
+      (activeFilter === 'under-budget' && meal.price <= maxBudget) ||
       (activeFilter === 'high-protein' && meal.proteinGrams >= 35) ||
       (activeFilter === 'quick-delivery' && meal.etaMinutes <= 20);
 
-    return queryMatches && filterMatches;
+    const mealTypeMatches =
+      mealType === 'any' ? true : inferMealTypeTags(meal).includes(mealType);
+
+    const cuisineMatches =
+      cuisine === 'any' ? true : inferCuisineTags(meal).includes(cuisine);
+
+    const spiceMatches =
+      spiceLevel === 'medium' ? true : inferSpiceLevel(meal) === spiceLevel;
+
+    return (
+      queryMatches &&
+      filterMatches &&
+      meal.price <= maxBudget &&
+      (!vegOnly || meal.isVeg) &&
+      mealTypeMatches &&
+      cuisineMatches &&
+      spiceMatches
+    );
   });
 
   return [...filtered].sort((a, b) => {
@@ -148,7 +207,15 @@ function DishCard({ meal }: { meal: MealRecommendation }) {
   );
 }
 
-export function MealPicks({ searchQuery, activeFilter }: MealPicksProps) {
+export function MealPicks({
+  searchQuery,
+  activeFilter,
+  maxBudget,
+  vegOnly,
+  mealType,
+  cuisine,
+  spiceLevel,
+}: MealPicksProps) {
   const statusQuery = useSwiggyStatus();
   const connected = statusQuery.data?.connected ?? false;
 
@@ -187,7 +254,16 @@ export function MealPicks({ searchQuery, activeFilter }: MealPicksProps) {
   const liveMeals = (menuQuery.data?.items ?? []).map((item, index) =>
     mapMenuToRecommendation(index, item),
   );
-  const meals = applyFilter(liveMeals, searchQuery, activeFilter);
+  const meals = applyFilter(
+    liveMeals,
+    searchQuery,
+    activeFilter,
+    maxBudget,
+    vegOnly,
+    mealType,
+    cuisine,
+    spiceLevel,
+  );
 
   return (
     <section className="space-y-4">
@@ -197,6 +273,9 @@ export function MealPicks({ searchQuery, activeFilter }: MealPicksProps) {
           <p className="text-muted-foreground text-sm">
             {meals.length} live options matched
             {activeFilter !== 'all' ? ` · ${activeFilter.replace('-', ' ')}` : ''}
+            {mealType !== 'any' ? ` · ${mealType}` : ''}
+            {cuisine !== 'any' ? ` · ${cuisine}` : ''}
+            {spiceLevel !== 'medium' ? ` · ${spiceLevel}` : ''}
           </p>
         </div>
       </div>

@@ -79,9 +79,17 @@ interface TodayPlanProps {
   meals: MealEntry[];
   searchQuery: string;
   activeFilter: SearchFilter;
+  maxBudget: number;
+  vegOnly: boolean;
 }
 
-export function TodayPlan({ meals: fallbackMeals, searchQuery, activeFilter }: TodayPlanProps) {
+export function TodayPlan({
+  meals: fallbackMeals,
+  searchQuery,
+  activeFilter,
+  maxBudget,
+  vegOnly,
+}: TodayPlanProps) {
   const statusQuery = useSwiggyStatus();
   const connected = statusQuery.data?.connected ?? false;
   const menuQueryValue = searchQuery.trim() || FILTER_TO_MENU_QUERY[activeFilter];
@@ -93,7 +101,10 @@ export function TodayPlan({ meals: fallbackMeals, searchQuery, activeFilter }: T
 
   const liveMeals =
     connected && !menuQuery.isError ? mapMenuToTodayPlan(menuQuery.data?.items ?? []) : [];
-  const meals = liveMeals.length > 0 ? liveMeals : fallbackMeals;
+  const baseMeals = liveMeals.length > 0 ? liveMeals : fallbackMeals;
+  const meals = baseMeals
+    .filter((meal) => meal.price <= maxBudget)
+    .filter((meal) => (!vegOnly ? true : meal.title.toLowerCase().includes('paneer') || meal.title.toLowerCase().includes('tofu') || meal.title.toLowerCase().includes('veg') || meal.title.toLowerCase().includes('yogurt')));
 
   return (
     <section className="space-y-4">
